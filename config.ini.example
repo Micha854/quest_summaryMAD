@@ -1,29 +1,36 @@
 [CONFIG]
+## leave config empty to not use telegram or discord
+# Telegram
 TOKEN: yourtelegramTokenHere
-
 CHATID: yourTelegramChatIDHere
+# Discord
+WEBHOOK: yourDiscordWebhookURLHere
 
-##Where you want to show your Pokéstoplocation? CUSTOM = on your RM or Monocle | GMAPS = show on Google Maps
-MAPMODE: CUSTOM
-
-##Leave MAPURL empty if you show your Pokéstoplocation on GMAPS
+# Leave MAPURL empty if you show your Pokéstoplocation on GMAPS
 MAPURL: https://map.yourdomainhere.com
 
+# URL to reach MADMin from where this script runs
 MADMINURL: http://localhost:5000
 
-##If you use the basic auth from MADmin, fill this. Leave it empty if you dont use it.
+# If you use the basic auth from MADmin, fill this. Leave it empty if you dont use it.
 USER: USERNAME
+PASS: PASSWORD
 
-PASS:PASSWORD
-
-##change this to change the weekdate language. Be careful, Windows has other locales than Linux. See https://docs.microsoft.com/en-us/cpp/c-runtime-library/language-strings?view=vs-2017
+# change this to change the weekdate language. Be careful, Windows has other locales than Linux. See https://docs.microsoft.com/en-us/cpp/c-runtime-library/language-strings?view=vs-2017
 LOCALE: en-US
 
-##Pokedex numbers of questrewards
+# Pokedex numbers of questrewards
 POKEMON: 102,113,131,142,147,246,327,345
 
-##amount of stardust to be listed
+# amount of stardust to be listed
 STARDUST: 1000,1500
 
-##amount of rare candy to be listed
+# amount of rare candy to be listed
 RARECANDY: 3,2,1
+
+# Use these to customize / localize message strings
+#CANDYMESSAGE: "Rare Candy"
+#DUSTMESSAGE: "Stardust"
+#PINAPMESSAGE: "Silver Pinap:"
+#NOTFOUNDMESSAGE: "Not found today."
+#FOLLOWINGMESSAGE: "Continued in following message ..."
