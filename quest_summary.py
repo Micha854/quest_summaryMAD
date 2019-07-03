@@ -217,30 +217,27 @@ discord_replace = (('$rarecandy$', discord_candystring),
                    ('$silverpinap$', discord_silverstring),
                    ('$amount$', str(len(data))),
                    ('$date', time.strftime("%A, %e.%m.%Y")), ('<b>', '**'),
-                   ('</b>', '**'))
+                   ('</b>', '**'), ('"', '\''))
 for r in discord_replace:
     discord_text = discord_text.replace(*r)
 
 
 def bot_sendtelegram(bot_message):
-    send_part = ""
-    for part in bot_message.split(2 * os.linesep):
-        new_part = str(send_part) + str(part)
-        if new_part.count("http") > 80:
-            send_part += str(2 * os.linesep)
-            send_part += str("<i>" + nextpagemsg + "</i>")
-            send_text = ('https://api.telegram.org/bot{}/sendMessage?chat_id={}' +
-                         '&parse_mode=html&text={}').format(token, chat_id,
-                                                            send_part)
-            requests.get(send_text)
-            send_part = str(part)
-        else:
-            send_part += str(2 * os.linesep)
-            send_part += str(part)
-    send_text = ('https://api.telegram.org/bot{}/sendMessage?chat_id={}' +
-                 '&parse_mode=html&text={}').format(token, chat_id,
-                                                    send_part)
-    requests.get(send_text)
+    assembled = ""
+    for line in bot_message.split(os.linesep):
+        assembled += str(line) + str(os.linesep) 
+        if assembled.count("http") > 80:
+            assembled += str(2 * os.linesep)
+            assembled += str("<i>" + nextpagemsg + "</i>")
+            request = ('https://api.telegram.org/bot{}/sendMessage?chat_id={}' +
+                       '&parse_mode=html&text={}').format(token, chat_id,
+                                                          assembled)
+            requests.get(request)
+            assembled = ""
+    request = ('https://api.telegram.org/bot{}/sendMessage?chat_id={}' +
+               '&parse_mode=html&text={}').format(token, chat_id,
+                                                  assembled)
+    requests.get(request)
 
 
 def discord_request(data, wh):
@@ -261,22 +258,49 @@ def discord_request(data, wh):
 
 
 def bot_senddiscord(bot_message):
+    send_part = ""
     for part in bot_message.split(2 * os.linesep):
-        if len(part) > 2000:
-            parts = part.split(os.linesep)
-        else:
-            parts = False
-        if not parts:
-            part += '\n\u200b'
-            data = {"username": "questsummary-Bot", "content": part}
-            print(part)
-            discord_request(data, discord_webhook)
-        else:
-            for part in parts:
-                data = {"username": "questsummary-Bot", "content": part}
-                print(part)
+        new_part = str(send_part) + str(part)
+        if len(new_part) > 1500 and len(send_part) > 1500:
+            parts = send_part.split(os.linesep)
+            print("{} parts".format(len(parts)))
+            small_send_part = ""
+            for small_part in parts:
+                small_new_part = str(small_send_part) + str(small_part)
+                if len(small_new_part) > 1500:
+                    if len(small_send_part) == 0:
+                        small_new_part += '\n\u200b'
+                        data = {"username": "questsummary-Bot", "content": small_new_part}
+                        print(small_new_part)
+                    else:
+                        small_send_part += '\n\u200b'
+                        data = {"username": "questsummary-Bot", "content": small_send_part}
+                        print(small_send_part)
+                        small_send_part = small_part
+                    discord_request(data, discord_webhook)
+                else:
+                    small_send_part += str(os.linesep)
+                    small_send_part += str(small_part)
+            if len(small_send_part) > 0:
+                small_send_part += '\n\u200b'
+                data = {"username": "questsummary-Bot", "content": small_send_part}
+                print(small_send_part)
                 discord_request(data, discord_webhook)
-
+            send_part = str(part)
+        elif len(new_part) > 1500 and len(send_part) > 0:
+            send_part += '\n\u200b'
+            data = {"username": "questsummary-Bot", "content": send_part}
+            print(send_part)
+            discord_request(data, discord_webhook)
+            send_part = str(part)
+        else:
+            send_part += str(2 * os.linesep)
+            send_part += str(part)
+    send_part += '\n\u200b'
+    data = {"username": "questsummary-Bot", "content": send_part}
+    print(send_part)
+    discord_request(data, discord_webhook)
+            
 
 if telegram_enabled:
     bot_sendtelegram(text)
